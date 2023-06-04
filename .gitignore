@@ -1,24 +1,73 @@
-# Compiled class file
-*.class
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
-# Log file
-*.log
+public class DailyCalorieMonitor {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
 
-# BlueJ files
-*.ctxt
+        System.out.println("Daily Calorie Intake Monitor");
+        System.out.println("-----------------------------");
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+        System.out.print("Enter your target daily calorie intake: ");
+        int targetCalories = scanner.nextInt();
 
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+        int[] calorieIntake = new int[7]; // Array to store daily calorie intake for a week
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+        for (int i = 0; i < calorieIntake.length; i++) {
+            System.out.print("Enter the number of calories consumed for day " + (i + 1) + ": ");
+            calorieIntake[i] = scanner.nextInt();
+
+            while (calorieIntake[i] < 0) {
+                System.out.println("Invalid input. Please enter a non-negative number of calories.");
+                System.out.print("Enter the number of calories consumed for day " + (i + 1) + ": ");
+                calorieIntake[i] = scanner.nextInt();
+            }
+        }
+
+        int totalCalories = calculateTotalCalories(calorieIntake);
+        int remainingCalories = targetCalories - totalCalories;
+
+        System.out.println("-----------------------------");
+        System.out.println("Daily Calorie Intake Summary");
+        System.out.println("-----------------------------");
+        System.out.println("Target Calories: " + targetCalories);
+        System.out.println("Total Calories Consumed: " + totalCalories);
+
+        if (remainingCalories < 0) {
+            System.out.println("You have exceeded your daily calorie intake by " + Math.abs(remainingCalories) + " calories.");
+        } else {
+            System.out.println("Remaining Calories: " + remainingCalories);
+        }
+
+        // Store data in a file for persistence
+        saveCalorieIntakeToFile(calorieIntake);
+
+        scanner.close();
+    }
+
+    private static int calculateTotalCalories(int[] calorieIntake) {
+        int totalCalories = 0;
+        for (int calories : calorieIntake) {
+            totalCalories += calories;
+        }
+        return totalCalories;
+    }
+
+    private static void saveCalorieIntakeToFile(int[] calorieIntake) {
+        try {
+            File file = new File("calorie_intake.txt");
+            FileWriter writer = new FileWriter(file);
+
+            for (int i = 0; i < calorieIntake.length; i++) {
+                writer.write("Day " + (i + 1) + ": " + calorieIntake[i] + " calories\n");
+            }
+
+            writer.close();
+            System.out.println("Calorie intake data saved to file.");
+        } catch (IOException e) {
+            System.out.println("An error occurred while saving the calorie intake data.");
+        }
+    }
+}
